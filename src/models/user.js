@@ -33,13 +33,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    trim: true,
-    minlength: 8,
-    validate(value) {
-      if (!value.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/)) {
-        throw new Error('Password must have at least one letter and one number!');
-      }
-    }
+    trim: true
   },
   avatar: {
     type: Buffer
@@ -71,9 +65,25 @@ userSchema.methods.generateAuthToken = async function () {
   return token;
 };
 
+userSchema.methods.toJSON = function () {
+  const user = this;
+  const userObject = user.toObject();
+
+  delete userObject.password;
+  delete userObject.avatar;
+  delete userObject.tokens;
+
+  return userObject;
+};
+
 // Hash the plain text password before saving
 userSchema.pre('save', async function (next) {
   const user = this;
+
+  if (user.isModified('password')) {
+    user.password = await bcrypt.hash(user.password, 8);
+  }
+
   next();
 });
 
