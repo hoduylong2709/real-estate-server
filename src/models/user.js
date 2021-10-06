@@ -99,7 +99,7 @@ userSchema.statics.verifyUser = async (id, verifyCode) => {
     throw new Error('Unable to verify!');
   }
 
-  const isMatch = verifyCode === user.verifyCode;
+  const isMatch = parseInt(verifyCode) === user.verifyCode;
 
   if (!isMatch) {
     throw new Error('Unable to verify!');
