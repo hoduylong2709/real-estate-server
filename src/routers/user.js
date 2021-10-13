@@ -3,6 +3,7 @@ const User = require('../models/user');
 const router = new express.Router();
 const { sendMail } = require('../utils/mailer');
 const { generateVerifyCode } = require('../utils/generateVerifyCode');
+const auth = require('../middleware/auth');
 
 router.post('/users/login', async (req, res) => {
   try {
@@ -38,6 +39,26 @@ router.post('/users/verify/:id', async (req, res) => {
     res.send({ user, token });
   } catch (error) {
     res.status(400).send();
+  }
+});
+
+router.post('/users/logout', auth, async (req, res) => {
+  try {
+    req.user.tokens = req.user.tokens.filter(token => token.token !== req.token);
+    await req.user.save();
+    res.send();
+  } catch (error) {
+    res.status(500).send();
+  }
+});
+
+router.post('/users/logoutAll', auth, async (req, res) => {
+  try {
+    req.user.tokens = [];
+    await req.user.save();
+    res.send();
+  } catch (error) {
+    res.status(500).send();
   }
 });
 

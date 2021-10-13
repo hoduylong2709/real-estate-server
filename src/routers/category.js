@@ -4,6 +4,7 @@ const sharp = require('sharp');
 const Category = require('../models/category');
 const { base64ArrayBuffer } = require('../utils/convertArrayBufferToBase64String');
 const router = new express.Router();
+const auth = require('../middleware/auth');
 
 const upload = multer({
   limits: {
@@ -34,7 +35,7 @@ router.post('/categories', upload.single('categoryImage'), async (req, res) => {
   }
 });
 
-router.get('/categories', async (req, res) => {
+router.get('/categories', auth, async (req, res) => {
   try {
     const categories = await Category.find({});
     res.send(categories);
