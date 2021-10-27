@@ -6,6 +6,38 @@ const { base64ArrayBuffer } = require('../utils/convertArrayBufferToBase64String
 const router = new express.Router();
 const auth = require('../middleware/auth');
 
+// GET /listings?sold=true
+// GET /listings?limit=10&skip=20
+// GET /listings?sortBy=createdAt:desc
+router.get('/listings', auth, async (req, res) => {
+  const match = {};
+  const sort = {};
+
+  if (req.query.sortBy) {
+    const parts = req.query.sortBy.split(':');
+    sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
+  }
+
+  if (req.query.sold) {
+    match.sold = req.query.sold === 'true';
+  }
+
+  try {
+    await req.user.populate({
+      path: 'listings',
+      match,
+      options: {
+        limit: req.query.limit && parseInt(req.query.limit),
+        skip: req.query.skip && parseInt(req.query.skip),
+        sort
+      }
+    });
+    res.send(req.user.listings)
+  } catch (error) {
+    res.status(500).send();
+  }
+});
+
 router.post('/listings', auth, async (req, res) => {
   const listing = new Listing({ ...req.body, owner: req.user._id });
 
