@@ -7,15 +7,10 @@ const categoryFilterSchema = new mongoose.Schema({
     trim: true
   },
   rentOrBuy: {
-    type: String,
-    required: true
-  },
-  priceRange: {
-    type: Object,
-    required: true
+    type: String
   },
   squareFeet: {
-    type: Object
+    type: String
   },
   bedrooms: {
     type: Number
@@ -27,7 +22,7 @@ const categoryFilterSchema = new mongoose.Schema({
     type: Boolean
   },
   yearBuilt: {
-    type: Number
+    type: String
   },
   closeToPublicTransportation: {
     type: Boolean

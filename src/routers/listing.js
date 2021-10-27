@@ -19,7 +19,7 @@ router.post('/listings', auth, async (req, res) => {
 
 const upload = multer({
   limits: {
-    fileSize: 1000000
+    fileSize: 5242800
   },
   fileFilter(req, file, cb) {
     if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
@@ -46,7 +46,7 @@ router.post('/listings/photos/:id', auth, upload.array('photos', 10), async (req
 
     listing.photos = base64Photos;
     await listing.save();
-    res.send(listing);
+    res.send(listing.photos);
   } catch (error) {
     res.status(400).send(error);
   }

@@ -13,7 +13,7 @@ const listingSchema = new mongoose.Schema({
     trim: true
   },
   price: {
-    type: Number,
+    type: Object,
     required: true
   },
   category: {
@@ -29,8 +29,7 @@ const listingSchema = new mongoose.Schema({
   },
   isSold: {
     type: Boolean,
-    default: false,
-    required: true
+    default: false
   },
   favoriteUsers: {
     type: [mongoose.ObjectId],
