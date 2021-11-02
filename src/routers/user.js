@@ -1,9 +1,12 @@
 const express = require('express');
 const User = require('../models/user');
+const multer = require('multer');
+const sharp = require('sharp');
 const router = new express.Router();
 const { sendMail } = require('../utils/mailer');
 const { generateVerifyCode } = require('../utils/generateVerifyCode');
 const auth = require('../middleware/auth');
+const { base64ArrayBuffer } = require('../utils/convertArrayBufferToBase64String');
 
 router.post('/users/login', async (req, res) => {
   try {
@@ -60,6 +63,38 @@ router.post('/users/logoutAll', auth, async (req, res) => {
   } catch (error) {
     res.status(500).send();
   }
+});
+
+router.get('/users/me', auth, async (req, res) => {
+  res.send(req.user);
+});
+
+const upload = multer({
+  limits: {
+    fileSize: 5242800
+  },
+  fileFilter(req, file, cb) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+      return cb(new Error('Please upload an image'));
+    }
+    cb(undefined, true);
+  }
+});
+
+router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
+  const buffer = await sharp(req.file.buffer).resize({ width: 150, height: 150 }).png().toBuffer();
+  const base64String = base64ArrayBuffer(buffer);
+  req.user.avatar = base64String;
+  await req.user.save();
+  res.send();
+}, (error, req, res, next) => {
+  res.status(400).send({ error: error.message });
+});
+
+router.delete('/users/me/avatar', auth, async (req, res) => {
+  req.user.avatar = undefined;
+  await req.user.save();
+  res.send();
 });
 
 module.exports = router;
