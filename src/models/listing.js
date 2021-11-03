@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { categoryFilterSchema } = require('./categoryFilter');
+const { reviewSchema } = require('./review');
 
 const listingSchema = new mongoose.Schema({
   title: {
@@ -39,7 +40,12 @@ const listingSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: 'User'
-  }
+  },
+  stars: {
+    type: Array,
+    default: []
+  },
+  reviews: [reviewSchema]
 }, { timestamps: true });
 
 const Listing = mongoose.model('Listing', listingSchema);
