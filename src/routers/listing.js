@@ -38,6 +38,20 @@ router.get('/listings', auth, async (req, res) => {
   }
 });
 
+router.get('/listings/:id', auth, async (req, res) => {
+  const _id = req.params.id;
+
+  try {
+    const listing = await Listing.findOne({ _id, owner: req.user._id });
+    if (!listing) {
+      return res.status(404).send();
+    }
+    res.send(listing);
+  } catch (error) {
+    res.status(500).send();
+  }
+});
+
 router.post('/listings', auth, async (req, res) => {
   const listing = new Listing({ ...req.body, owner: req.user._id });
 
