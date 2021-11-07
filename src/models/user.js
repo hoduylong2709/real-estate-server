@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
-const Listing = require('./listing');
+const { googleLoginSchema } = require('./googleLogin');
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -33,7 +33,6 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
     trim: true
   },
   avatar: {
@@ -50,9 +49,13 @@ const userSchema = new mongoose.Schema({
     default: false
   },
   verifyCode: {
-    type: Number,
-    required: true
-  }
+    type: Number
+  },
+  isGoogleAccount: {
+    type: Boolean,
+    default: false
+  },
+  googleLogin: [googleLoginSchema]
 }, { timestamps: true });
 
 userSchema.virtual('listings', {
@@ -78,6 +81,7 @@ userSchema.methods.toJSON = function () {
 
   delete userObject.password;
   delete userObject.tokens;
+  delete userObject.googleLogin;
 
   return userObject;
 };

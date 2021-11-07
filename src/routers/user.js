@@ -21,6 +21,37 @@ router.post('/users/login', async (req, res) => {
   }
 });
 
+router.post('/users/loginWithGoogle', async (req, res) => {
+  const { firstName, lastName, email, userId, idToken, avatar } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      if (user.isGoogleAccount) {
+        user.googleLogin = user.googleLogin.concat({ userId, idToken });
+        await user.save();
+        res.send({ user, idToken });
+      } else {
+        throw new Error('Email was used!');
+      }
+    } else {
+      const newUser = new User({
+        firstName,
+        lastName,
+        email,
+        isVerified: true,
+        isGoogleAccount: true,
+        avatar
+      });
+      newUser.googleLogin = newUser.googleLogin.concat({ userId, idToken });
+      await newUser.save();
+      res.send({ newUser, idToken });
+    }
+  } catch (error) {
+    res.status(400).send();
+  }
+});
+
 router.post('/users', async (req, res) => {
   const user = new User(req.body);
   const verifyCode = generateVerifyCode();
@@ -47,7 +78,11 @@ router.post('/users/verify/:id', async (req, res) => {
 
 router.post('/users/logout', auth, async (req, res) => {
   try {
-    req.user.tokens = req.user.tokens.filter(token => token.token !== req.token);
+    if (req.user.isGoogleAccount) {
+      req.user.googleLogin = req.user.googleLogin.filter(loginData => loginData.idToken !== req.token);
+    } else {
+      req.user.tokens = req.user.tokens.filter(token => token.token !== req.token);
+    }
     await req.user.save();
     res.send();
   } catch (error) {
@@ -57,7 +92,12 @@ router.post('/users/logout', auth, async (req, res) => {
 
 router.post('/users/logoutAll', auth, async (req, res) => {
   try {
-    req.user.tokens = [];
+    if (req.user.isGoogleAccount) {
+      req.user.googleLogin = [];
+    } else {
+      req.user.tokens = [];
+    }
+
     await req.user.save();
     res.send();
   } catch (error) {

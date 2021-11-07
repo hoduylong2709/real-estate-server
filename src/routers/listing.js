@@ -32,7 +32,7 @@ router.get('/listings', auth, async (req, res) => {
         sort
       }
     });
-    res.send(req.user.listings)
+    res.send(req.user.listings);
   } catch (error) {
     res.status(500).send();
   }
