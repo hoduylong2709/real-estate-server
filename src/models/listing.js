@@ -45,6 +45,10 @@ const listingSchema = new mongoose.Schema({
     type: Array,
     default: []
   },
+  views: {
+    type: Number,
+    default: 0
+  },
   reviews: [reviewSchema]
 }, { timestamps: true });
 

@@ -55,7 +55,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  googleLogin: [googleLoginSchema]
+  googleLogin: [googleLoginSchema],
+  publicIdCloudinary: {
+    type: String
+  }
 }, { timestamps: true });
 
 userSchema.virtual('listings', {

@@ -3,6 +3,7 @@ const multer = require('multer');
 const sharp = require('sharp');
 const Listing = require('../models/listing');
 const { base64ArrayBuffer } = require('../utils/convertArrayBufferToBase64String');
+const { compareView } = require('../utils/compare');
 const router = new express.Router();
 const auth = require('../middleware/auth');
 
@@ -33,6 +34,18 @@ router.get('/listings', auth, async (req, res) => {
       }
     });
     res.send(req.user.listings);
+  } catch (error) {
+    res.status(500).send();
+  }
+});
+
+router.get('/listings/popular', auth, async (req, res) => {
+  try {
+    const allListings = await Listing.find({});
+    const viewBasedSortedListings = allListings.filter(
+      listing => listing.owner.toString() !== req.user._id.toString()
+    ).sort(compareView).slice(0, 3);
+    res.send(viewBasedSortedListings);
   } catch (error) {
     res.status(500).send();
   }
@@ -77,9 +90,9 @@ const upload = multer({
 
 router.post('/listings/photos/:id', auth, upload.array('photos', 10), async (req, res) => {
   const bufferPhotos = await Promise.all(req.files.map(async (photo) => {
-    const buffer = await sharp(photo.buffer).resize({ width: 150, height: 150 }).png().toBuffer();
+    const buffer = await sharp(photo.buffer).png().toBuffer();
     return buffer;
-  }))
+  }));
 
   const base64Photos = bufferPhotos.map(bufferPhoto => base64ArrayBuffer(bufferPhoto));
 

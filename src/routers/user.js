@@ -1,12 +1,10 @@
 const express = require('express');
+const cloudinary = require('cloudinary').v2;
 const User = require('../models/user');
-const multer = require('multer');
-const sharp = require('sharp');
 const router = new express.Router();
 const { sendMail } = require('../utils/mailer');
 const { generateVerifyCode } = require('../utils/generateVerifyCode');
 const auth = require('../middleware/auth');
-const { base64ArrayBuffer } = require('../utils/convertArrayBufferToBase64String');
 
 router.post('/users/login', async (req, res) => {
   try {
@@ -109,31 +107,31 @@ router.get('/users/me', auth, async (req, res) => {
   res.send(req.user);
 });
 
-const upload = multer({
-  limits: {
-    fileSize: 5242800
-  },
-  fileFilter(req, file, cb) {
-    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-      return cb(new Error('Please upload an image'));
-    }
-    cb(undefined, true);
+router.post('/users/me/avatar', auth, async (req, res) => {
+  const imageUrl = req.body.imageUrl;
+  const publicIdCloudinary = req.body.publicIdCloudinary;
+  try {
+    req.user.avatar = imageUrl;
+    req.user.publicIdCloudinary = publicIdCloudinary;
+    await req.user.save();
+    res.send(req.user.avatar);
+  } catch (error) {
+    res.status(400).send(error);
   }
 });
 
-router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
-  const buffer = await sharp(req.file.buffer).resize({ width: 150, height: 150 }).png().toBuffer();
-  const base64String = base64ArrayBuffer(buffer);
-  req.user.avatar = base64String;
-  await req.user.save();
-  res.send();
-}, (error, req, res, next) => {
-  res.status(400).send({ error: error.message });
+cloudinary.config({
+  cloud_name: 'longhoduy',
+  api_key: '381771743799312',
+  api_secret: 'r-37Bh50GZ-Vkqvvf8u9BTCTrWg'
 });
 
 router.delete('/users/me/avatar', auth, async (req, res) => {
+  const publicIdCloudinary = req.body.public_id;
   req.user.avatar = undefined;
+  req.user.publicIdCloudinary = undefined;
   await req.user.save();
+  await cloudinary.uploader.destroy(publicIdCloudinary);
   res.send();
 });
 
