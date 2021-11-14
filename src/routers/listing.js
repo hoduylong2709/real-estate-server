@@ -1,8 +1,6 @@
 const express = require('express');
-const multer = require('multer');
-const sharp = require('sharp');
+const cloudinary = require('cloudinary').v2;
 const Listing = require('../models/listing');
-const { base64ArrayBuffer } = require('../utils/convertArrayBufferToBase64String');
 const { compareView } = require('../utils/compare');
 const router = new express.Router();
 const auth = require('../middleware/auth');
@@ -76,39 +74,16 @@ router.post('/listings', auth, async (req, res) => {
   }
 });
 
-const upload = multer({
-  limits: {
-    fileSize: 5242800
-  },
-  fileFilter(req, file, cb) {
-    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-      return cb(new Error('Please upload an image'));
-    }
-    cb(undefined, true);
-  }
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET
 });
 
-router.post('/listings/photos/:id', auth, upload.array('photos', 10), async (req, res) => {
-  const bufferPhotos = await Promise.all(req.files.map(async (photo) => {
-    const buffer = await sharp(photo.buffer).png().toBuffer();
-    return buffer;
-  }));
-
-  const base64Photos = bufferPhotos.map(bufferPhoto => base64ArrayBuffer(bufferPhoto));
-
-  try {
-    const listing = await Listing.findOne({ _id: req.params.id, owner: req.user._id });
-
-    if (!listing) {
-      return res.status(404).send();
-    }
-
-    listing.photos = base64Photos;
-    await listing.save();
-    res.send(listing.photos);
-  } catch (error) {
-    res.status(400).send(error);
-  }
+router.delete('/listings/cloudinary', auth, async (req, res) => {
+  const publicId = req.body.publicId;
+  await cloudinary.uploader.destroy(publicId);
+  res.send();
 });
 
 module.exports = router;

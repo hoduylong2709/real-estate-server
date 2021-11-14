@@ -121,9 +121,9 @@ router.post('/users/me/avatar', auth, async (req, res) => {
 });
 
 cloudinary.config({
-  cloud_name: 'longhoduy',
-  api_key: '381771743799312',
-  api_secret: 'r-37Bh50GZ-Vkqvvf8u9BTCTrWg'
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET
 });
 
 router.delete('/users/me/avatar', auth, async (req, res) => {

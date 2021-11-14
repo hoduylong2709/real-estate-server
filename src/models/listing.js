@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { categoryFilterSchema } = require('./categoryFilter');
+const { cloudinaryImageSchema } = require('./cloudinaryImage');
 const { reviewSchema } = require('./review');
 
 const listingSchema = new mongoose.Schema({
@@ -26,7 +27,7 @@ const listingSchema = new mongoose.Schema({
     required: true
   },
   photos: {
-    type: [String]
+    type: [cloudinaryImageSchema]
   },
   isSold: {
     type: Boolean,
