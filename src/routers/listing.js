@@ -86,4 +86,35 @@ router.delete('/listings/cloudinary', auth, async (req, res) => {
   res.send();
 });
 
+router.post('/listings/favorite/:id', auth, async (req, res) => {
+  try {
+    const listing = await Listing.findOne({ _id: req.params.id });
+
+    if (!listing) {
+      return res.status(404).send();
+    }
+
+    listing.favoriteUsers.addToSet(req.user._id);
+    await listing.save();
+    res.send(listing);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+router.delete('/listings/favorite/:id', auth, async (req, res) => {
+  const _id = req.params.id;
+  const userId = req.user._id;
+
+  try {
+    const listing = await Listing.findOne({ _id });
+    const updatedFavoriteUsers = listing.favoriteUsers.filter(id => id.toString() !== userId.toString());
+    listing.favoriteUsers = updatedFavoriteUsers;
+    await listing.save();
+    res.send(listing);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 module.exports = router;
