@@ -120,6 +120,20 @@ router.post('/users/me/avatar', auth, async (req, res) => {
   }
 });
 
+router.get('/users/:id', auth, async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.params.id });
+
+    if (!user) {
+      return res.status(404).send()
+    }
+
+    res.send(user);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,

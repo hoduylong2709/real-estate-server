@@ -43,7 +43,7 @@ const listingSchema = new mongoose.Schema({
     ref: 'User'
   },
   stars: {
-    type: Array,
+    type: [Number],
     default: []
   },
   views: {
