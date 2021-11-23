@@ -132,4 +132,23 @@ router.delete('/listings/favorite/:id', auth, async (req, res) => {
   }
 });
 
+router.post('/listings/rating/:id', auth, async (req, res) => {
+  const _id = req.params.id;
+  const rating = { ...req.body, owner: req.user._id };
+
+  try {
+    const listing = await Listing.findOne({ _id });
+
+    if (!listing) {
+      return res.status(404).send();
+    }
+
+    listing.ratings.push(rating);
+    await listing.save();
+    res.send(rating);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 module.exports = router;

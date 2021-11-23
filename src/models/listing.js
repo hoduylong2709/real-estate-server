@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const { categoryFilterSchema } = require('./categoryFilter');
 const { cloudinaryImageSchema } = require('./cloudinaryImage');
 const { reviewSchema } = require('./review');
+const { ratingSchema } = require('./Rating');
 
 const listingSchema = new mongoose.Schema({
   title: {
@@ -42,10 +43,7 @@ const listingSchema = new mongoose.Schema({
     required: true,
     ref: 'User'
   },
-  stars: {
-    type: [Number],
-    default: []
-  },
+  ratings: [ratingSchema],
   views: {
     type: Number,
     default: 0
