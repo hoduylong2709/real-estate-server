@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const { categoryFilterSchema } = require('./categoryFilter');
 const { cloudinaryImageSchema } = require('./cloudinaryImage');
-const { reviewSchema } = require('./review');
 const { ratingSchema } = require('./Rating');
 
 const listingSchema = new mongoose.Schema({
@@ -47,8 +46,7 @@ const listingSchema = new mongoose.Schema({
   views: {
     type: Number,
     default: 0
-  },
-  reviews: [reviewSchema]
+  }
 }, { timestamps: true });
 
 const Listing = mongoose.model('Listing', listingSchema);
