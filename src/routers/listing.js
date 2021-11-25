@@ -134,7 +134,14 @@ router.delete('/listings/favorite/:id', auth, async (req, res) => {
 
 router.post('/listings/rating/:id', auth, async (req, res) => {
   const _id = req.params.id;
-  const rating = { ...req.body, owner: req.user._id };
+  const rating = {
+    ...req.body,
+    owner: {
+      id: req.user._id,
+      fullname: `${req.user.firstName} ${req.user.lastName}`,
+      avatar: req.user.avatar
+    }
+  };
 
   try {
     const listing = await Listing.findOne({ _id });

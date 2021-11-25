@@ -10,9 +10,8 @@ const ratingSchema = new mongoose.Schema({
     trim: true
   },
   owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: 'User'
+    type: Object,
+    required: true
   }
 }, { timestamps: true });
 
