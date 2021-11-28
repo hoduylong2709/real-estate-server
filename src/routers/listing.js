@@ -158,4 +158,23 @@ router.post('/listings/rating/:id', auth, async (req, res) => {
   }
 });
 
+router.get('/listings/ratings/:id', auth, async (req, res) => {
+  const _id = req.params.id;
+  console.log(_id);
+
+  try {
+    const listing = await Listing.findOne({ _id });
+
+    if (!listing) {
+      return res.status(404).send();
+    }
+
+    res.send(listing.ratings.sort((rating1, rating2) => {
+      return rating2.createdAt - rating1.createdAt;
+    }));
+  } catch (error) {
+    res.status(500).send();
+  }
+});
+
 module.exports = router;
