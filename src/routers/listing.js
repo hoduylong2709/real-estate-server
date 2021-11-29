@@ -160,7 +160,6 @@ router.post('/listings/rating/:id', auth, async (req, res) => {
 
 router.get('/listings/ratings/:id', auth, async (req, res) => {
   const _id = req.params.id;
-  console.log(_id);
 
   try {
     const listing = await Listing.findOne({ _id });
@@ -169,9 +168,29 @@ router.get('/listings/ratings/:id', auth, async (req, res) => {
       return res.status(404).send();
     }
 
-    res.send(listing.ratings.sort((rating1, rating2) => {
+    let yourRating = null;
+    let otherRatings = [];
+    let returnRatings = [];
+
+    listing.ratings.forEach(rating => {
+      if (rating.owner.id.toString() === req.user._id.toString()) {
+        yourRating = rating;
+      } else {
+        otherRatings.push(rating);
+      }
+    });
+
+    otherRatings.sort((rating1, rating2) => {
       return rating2.createdAt - rating1.createdAt;
-    }));
+    });
+
+    if (yourRating) {
+      returnRatings = [yourRating, ...otherRatings];
+    } else {
+      returnRatings = otherRatings;
+    }
+
+    res.send(returnRatings);
   } catch (error) {
     res.status(500).send();
   }
