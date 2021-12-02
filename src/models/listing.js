@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { categoryFilterSchema } = require('./categoryFilter');
 const { cloudinaryImageSchema } = require('./cloudinaryImage');
-const { ratingSchema } = require('./Rating');
+const { ratingSchema } = require('./rating');
 
 const listingSchema = new mongoose.Schema({
   title: {

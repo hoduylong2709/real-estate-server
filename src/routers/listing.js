@@ -196,4 +196,55 @@ router.get('/listings/ratings/:id', auth, async (req, res) => {
   }
 });
 
+router.delete('/listings/ratings/:id', auth, async (req, res) => {
+  const ratingId = req.params.id;
+  const listingId = req.body.listingId;
+
+  try {
+    const listing = await Listing.findOne({ _id: listingId });
+
+    if (!listing) {
+      return res.status(404).send({ error: 'Listing does not exist!' });
+    }
+
+    listing.ratings = listing.ratings.filter(rating => rating._id.toString() !== ratingId);
+    await listing.save();
+    res.send();
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+router.patch('/listings/ratings/:id', auth, async (req, res) => {
+  const keyArray = Object.keys(req.body);
+  const updates = keyArray.filter(key => key !== 'listingId');
+  const allowedUpdates = ['stars', 'review'];
+  const isValidOperation = updates.every(update => allowedUpdates.includes(update));
+
+  if (!isValidOperation) {
+    return res.status(400).send({ error: 'Invalid updates!' });
+  }
+
+  try {
+    const listing = await Listing.findOne({ _id: req.body.listingId });
+
+    if (!listing) {
+      return res.status(404).send({ error: 'Listing does not exist!' });
+    }
+
+    const rating = listing.ratings.find(rating => rating._id.toString() === req.params.id);
+
+    updates.forEach(update => rating[update] = req.body[update]);
+    listing.ratings.splice(
+      listing.ratings.findIndex(rating => rating._id.toString() === req.params.id),
+      1,
+      rating
+    );
+    await listing.save();
+    res.send();
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 module.exports = router;
