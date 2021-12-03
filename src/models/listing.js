@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { categoryFilterSchema } = require('./categoryFilter');
 const { cloudinaryImageSchema } = require('./cloudinaryImage');
-const { ratingSchema } = require('./rating');
+const Rating = require('./rating');
 
 const listingSchema = new mongoose.Schema({
   title: {
@@ -42,12 +42,22 @@ const listingSchema = new mongoose.Schema({
     required: true,
     ref: 'User'
   },
-  ratings: [ratingSchema],
+  ratings: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Rating'
+  }],
   views: {
     type: Number,
     default: 0
   }
 }, { timestamps: true });
+
+// Delete ratings when listing is removed
+listingSchema.pre('remove', async function (next) {
+  const listing = this;
+  await Rating.deleteMany({ listingId: listing._id });
+  next();
+});
 
 const Listing = mongoose.model('Listing', listingSchema);
 

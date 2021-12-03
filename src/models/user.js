@@ -67,6 +67,12 @@ userSchema.virtual('listings', {
   foreignField: 'owner'
 });
 
+userSchema.virtual('ratings', {
+  ref: 'Rating',
+  localField: '_id',
+  foreignField: 'owner'
+});
+
 userSchema.methods.generateAuthToken = async function () {
   const user = this;
 

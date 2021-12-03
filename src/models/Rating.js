@@ -10,9 +10,17 @@ const ratingSchema = new mongoose.Schema({
     trim: true
   },
   owner: {
-    type: Object,
-    required: true
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'User'
+  },
+  listingId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'Listing'
   }
 }, { timestamps: true });
 
-module.exports = { ratingSchema };
+const Rating = mongoose.model('Rating', ratingSchema);
+
+module.exports = Rating;
