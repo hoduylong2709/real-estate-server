@@ -8,7 +8,7 @@ const auth = require('../middleware/auth');
 // GET /listings?sold=true
 // GET /listings?limit=10&skip=20
 // GET /listings?sortBy=createdAt:desc
-router.get('/listings', auth, async (req, res) => {
+router.get('/listings/me', auth, async (req, res) => {
   const match = {};
   const sort = {};
 
@@ -29,6 +29,9 @@ router.get('/listings', auth, async (req, res) => {
         limit: req.query.limit && parseInt(req.query.limit),
         skip: req.query.skip && parseInt(req.query.skip),
         sort
+      },
+      populate: {
+        path: 'ratings'
       }
     });
     res.send(req.user.listings);
