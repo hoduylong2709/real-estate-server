@@ -5,6 +5,12 @@ const { compareView } = require('../utils/compare');
 const router = new express.Router();
 const auth = require('../middleware/auth');
 
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET
+});
+
 // GET /listings?sold=true
 // GET /listings?limit=10&skip=20
 // GET /listings?sortBy=createdAt:desc
@@ -92,12 +98,6 @@ router.post('/listings', auth, async (req, res) => {
   }
 });
 
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET
-});
-
 router.delete('/listings/cloudinary', auth, async (req, res) => {
   const publicId = req.body.publicId;
   await cloudinary.uploader.destroy(publicId);
@@ -132,6 +132,25 @@ router.delete('/listings/favorite/:id', auth, async (req, res) => {
     res.send(listing);
   } catch (error) {
     res.status(500).send(error);
+  }
+});
+
+router.delete('/listings/:id', auth, async (req, res) => {
+  try {
+    const listing = await Listing.findOne({ _id: req.params.id, owner: req.user._id });
+
+    if (!listing) {
+      return res.status(404).send();
+    }
+
+    for (let i = 0; i < listing.photos.length; i++) {
+      await cloudinary.uploader.destroy(listing.photos[i].publicId);
+    }
+
+    await listing.remove();
+    res.send(listing);
+  } catch (error) {
+    res.status(500).send();
   }
 });
 
