@@ -154,4 +154,132 @@ router.delete('/listings/:id', auth, async (req, res) => {
   }
 });
 
+router.patch('/listings/:id', auth, async (req, res) => {
+  const updates = Object.keys(req.body);
+  const allowedUpdates = [
+    'title',
+    'description',
+    'location',
+    'isSold'
+  ];
+  const isValidOperation = updates.every(update => allowedUpdates.includes(update));
+
+  if (!isValidOperation) {
+    return res.status(400).send({ error: 'Invalid updates!' });
+  }
+
+  try {
+    const listing = await Listing.findOne({ _id: req.params.id, owner: req.user._id });
+
+    if (!listing) {
+      return res.status(404).send();
+    }
+
+    updates.forEach(update => listing[update] = req.body[update]);
+    await listing.save();
+    res.send(listing);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+// Update photos of listing
+router.patch('/listings/photos/:id', auth, async (req, res) => {
+  const updates = Object.keys(req.body);
+  const allowedUpdates = ['deleted', 'new'];
+  const isValidOperation = updates.every(update => allowedUpdates.includes(update));
+
+  if (!isValidOperation) {
+    return res.status(400).send({ error: 'Invalid updates!' });
+  }
+
+  try {
+    const listing = await Listing.findOne({ _id: req.params.id, owner: req.user._id });
+
+    if (!listing) {
+      return res.status(404).send();
+    }
+
+    if (req.body.new) {
+      listing.photos = listing.photos.concat(req.body.new);
+    }
+
+    if (req.body.deleted) {
+      console.log('here');
+      listing.photos = listing.photos.filter(
+        photo => !req.body.deleted.some(deletedOne => deletedOne.publicId === photo.publicId)
+      );
+      for (let i = 0; i < req.body.deleted.length; i++) {
+        await cloudinary.uploader.destroy(req.body.deleted[i].publicId);
+      }
+    }
+
+    listing.markModified('photos');
+    await listing.save();
+    res.send(listing.price);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+// Update price of listing
+router.patch('/listings/price/:id', auth, async (req, res) => {
+  const updates = Object.keys(req.body);
+  const allowedUpdates = ['value', 'currency'];
+  const isValidOperation = updates.every(update => allowedUpdates.includes(update));
+
+  if (!isValidOperation) {
+    return res.status(400).send({ error: 'Invalid updates!' });
+  }
+
+  try {
+    const listing = await Listing.findOne({ _id: req.params.id, owner: req.user._id });
+
+    if (!listing) {
+      return res.status(404).send();
+    }
+
+    updates.forEach(update => listing.price[update] = req.body[update]);
+    listing.markModified('price');
+    await listing.save();
+    res.send(listing.price);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+// Update category info of listing
+router.patch('/listings/category/:id', auth, async (req, res) => {
+  const updates = Object.keys(req.body);
+  const allowedUpdates = [
+    'rentOrBuy',
+    'squareFeet',
+    'bedrooms',
+    'baths',
+    'newConstruction',
+    'yearBuilt',
+    'closeToPublicTransportation'
+  ];
+  const isValidOperation = updates.every(update => allowedUpdates.includes(update));
+
+  if (!isValidOperation) {
+    return res.status(400).send({ error: 'Invalid updates!' });
+  }
+
+  try {
+    const listing = await Listing.findOne({ _id: req.params.id, owner: req.user._id });
+
+    if (!listing) {
+      return res.status(404).send();
+    }
+
+    updates.forEach(update => listing.category[update] = req.body[update]);
+    listing.markModified('category');
+    await listing.save();
+    res.send(listing.category);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 module.exports = router;

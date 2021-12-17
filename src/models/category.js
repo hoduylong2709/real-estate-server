@@ -14,10 +14,6 @@ const categorySchema = new mongoose.Schema({
     type: Boolean,
     required: true
   },
-  hasPriceRange: {
-    type: Boolean,
-    required: true
-  },
   hasSquareFeet: {
     type: Boolean,
     required: true
