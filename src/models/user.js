@@ -38,6 +38,12 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String
   },
+  favoriteListings: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Listing'
+    }
+  ],
   tokens: [{
     token: {
       type: String,

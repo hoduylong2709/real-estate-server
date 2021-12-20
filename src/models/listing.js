@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const { categoryFilterSchema } = require('./categoryFilter');
 const { cloudinaryImageSchema } = require('./cloudinaryImage');
 const Rating = require('./rating');
+const User = require('./user');
 
 const listingSchema = new mongoose.Schema({
   title: {
@@ -33,10 +34,12 @@ const listingSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  favoriteUsers: {
-    type: [mongoose.ObjectId],
-    default: []
-  },
+  favoriteUsers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  ],
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
@@ -56,6 +59,12 @@ const listingSchema = new mongoose.Schema({
 listingSchema.pre('remove', async function (next) {
   const listing = this;
   await Rating.deleteMany({ listingId: listing._id });
+  for await (const user of User.find({ favoriteListings: listing._id })) {
+    user.favoriteListings = user.favoriteListings.filter(
+      id => id.toString() !== listing._id.toString()
+    );
+    await user.save();
+  }
   next();
 });
 

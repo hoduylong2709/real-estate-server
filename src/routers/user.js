@@ -149,4 +149,39 @@ router.delete('/users/me/avatar', auth, async (req, res) => {
   res.send();
 });
 
+router.post('/users/me/favorite', auth, async (req, res) => {
+  const listingId = req.body.listingId;
+
+  try {
+    req.user.favoriteListings.addToSet(listingId);
+    await req.user.save();
+    res.send();
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+router.delete('/users/me/favorite/:id', auth, async (req, res) => {
+  const listingId = req.params.id;
+
+  try {
+    req.user.favoriteListings = req.user.favoriteListings.filter(
+      id => id.toString() !== listingId
+    );
+    await req.user.save();
+    res.send();
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+router.get('/users/me/favorite', auth, async (req, res) => {
+  try {
+    await req.user.populate('favoriteListings');
+    res.send(req.user.favoriteListings);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 module.exports = router;
