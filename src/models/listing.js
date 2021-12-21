@@ -55,7 +55,7 @@ const listingSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-// Delete ratings when listing is removed
+// Do necessary things when listing is removed
 listingSchema.pre('remove', async function (next) {
   const listing = this;
   await Rating.deleteMany({ listingId: listing._id });
