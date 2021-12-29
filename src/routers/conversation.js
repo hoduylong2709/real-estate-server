@@ -29,4 +29,19 @@ router.post('/conversations', auth, async (req, res) => {
   }
 });
 
+router.delete('/conversations/:id', auth, async (req, res) => {
+  try {
+    const conversation = await Conversation.findOne({ _id: req.params.id });
+
+    if (!conversation) {
+      return res.status(404).send();
+    }
+
+    await conversation.remove();
+    res.send(conversation);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 module.exports = router;
