@@ -8,8 +8,8 @@ router.get('/messages/:convId', auth, async (req, res) => {
   try {
     const messages = await Message.find({
       conversationId: req.params.convId
-    });
-    res.send(messages);
+    }).populate('senderId');
+    res.send(messages.reverse());
   } catch (error) {
     res.status(500).send();
   }

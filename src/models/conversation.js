@@ -9,6 +9,12 @@ const conversationSchema = new mongoose.Schema({
   ]
 }, { timestamps: true });
 
+conversationSchema.virtual('messages', {
+  ref: 'Message',
+  localField: '_id',
+  foreignField: 'conversationId'
+});
+
 const Conversation = mongoose.model('Conversation', conversationSchema);
 
 module.exports = Conversation;

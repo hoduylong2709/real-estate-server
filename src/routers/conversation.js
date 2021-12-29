@@ -8,7 +8,7 @@ router.get('/conversations/:userId', auth, async (req, res) => {
   try {
     const conversations = await Conversation.find({
       members: { $in: [req.params.userId] }
-    });
+    }).populate('members');
     res.send(conversations);
   } catch (error) {
     res.status(500).send();
