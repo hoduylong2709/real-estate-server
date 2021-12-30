@@ -37,7 +37,7 @@ router.get('/listings/me', auth, async (req, res) => {
         sort
       },
       populate: {
-        path: 'ratings'
+        path: 'ratings owner'
       }
     });
     res.send(req.user.listings);
@@ -48,9 +48,9 @@ router.get('/listings/me', auth, async (req, res) => {
 
 router.get('/listings/popular', auth, async (req, res) => {
   try {
-    const allListings = await Listing.find({}).populate('ratings');
+    const allListings = await Listing.find({}).populate('ratings owner');
     const viewBasedSortedListings = allListings.filter(
-      listing => listing.owner.toString() !== req.user._id.toString()
+      listing => listing.owner._id.toString() !== req.user._id.toString()
     ).sort(compareView).slice(0, 3);
     res.send(viewBasedSortedListings);
   } catch (error) {

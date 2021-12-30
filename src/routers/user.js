@@ -177,7 +177,10 @@ router.delete('/users/me/favorite/:id', auth, async (req, res) => {
 
 router.get('/users/me/favorite', auth, async (req, res) => {
   try {
-    await req.user.populate('favoriteListings');
+    await req.user.populate({
+      path: 'favoriteListings',
+      populate: 'owner'
+    });
     res.send(req.user.favoriteListings);
   } catch (error) {
     res.status(500).send(error);
