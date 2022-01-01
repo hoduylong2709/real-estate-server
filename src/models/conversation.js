@@ -7,6 +7,13 @@ const conversationSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
     }
+  ],
+  deletes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: []
+    }
   ]
 }, { timestamps: true });
 
@@ -19,7 +26,10 @@ conversationSchema.virtual('messages', {
 // Delete messages when conversation is removed
 conversationSchema.pre('remove', async function (next) {
   const conversation = this;
-  await Message.deleteMany({ conversationId: conversation._id });
+  const messages = await Message.find({ conversationId: conversation._id });
+  for (let i = 0; i < messages.length; i++) {
+    await messages[i].remove();
+  }
   next();
 });
 

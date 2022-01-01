@@ -29,6 +29,7 @@ router.post('/conversations', auth, async (req, res) => {
   }
 });
 
+// Delete conversation
 router.delete('/conversations/:id', auth, async (req, res) => {
   try {
     const conversation = await Conversation.findOne({ _id: req.params.id });
@@ -37,7 +38,14 @@ router.delete('/conversations/:id', auth, async (req, res) => {
       return res.status(404).send();
     }
 
-    await conversation.remove();
+    if (conversation.deletes.length === 0) {
+      conversation.deletes.push(req.user._id);
+      conversation.markModified('deletes');
+      await conversation.save();
+    } else {
+      await conversation.remove();
+    }
+
     res.send(conversation);
   } catch (error) {
     res.status(500).send(error);
