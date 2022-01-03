@@ -1,8 +1,10 @@
 const express = require('express');
+const cloudinary = require('cloudinary').v2;
 const Conversation = require('../models/conversation');
 const Message = require('../models/message');
 const router = new express.Router();
 const auth = require('../middleware/auth');
+const { getPublicId } = require('../utils/getPublicIdFromUrl');
 
 // Get conversations
 router.get('/conversations/:userId', auth, async (req, res) => {
@@ -65,6 +67,10 @@ router.delete('/conversations/:id', auth, async (req, res) => {
           messages[i].markModified('deletes');
           await messages[i].save();
         } else {
+          if (messages[i].image) {
+            const publicId = getPublicId(messages[i].image);
+            await cloudinary.uploader.destroy(publicId);
+          }
           await messages[i].remove();
         }
       }
