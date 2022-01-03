@@ -30,7 +30,14 @@ const messageSchema = new mongoose.Schema({
   video: {
     type: String,
     default: ''
-  }
+  },
+  deletes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: []
+    }
+  ]
 }, { timestamps: true });
 
 // Delete image at cloudinary when message is removed

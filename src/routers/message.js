@@ -7,7 +7,8 @@ const auth = require('../middleware/auth');
 router.get('/messages/:convId', auth, async (req, res) => {
   try {
     const messages = await Message.find({
-      conversationId: req.params.convId
+      conversationId: req.params.convId,
+      deletes: { $nin: [req.user._id] }
     }).populate('senderId');
     res.send(messages.reverse());
   } catch (error) {
