@@ -1,12 +1,6 @@
 const mongoose = require('mongoose');
-const cloudinary = require('cloudinary').v2;
 const { getPublicId } = require('../utils/getPublicIdFromUrl');
-
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET
-});
+const { cloudinary } = require('../utils/getCloudinaryConfig');
 
 const messageSchema = new mongoose.Schema({
   conversationId: {

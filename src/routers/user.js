@@ -1,10 +1,10 @@
 const express = require('express');
-const cloudinary = require('cloudinary').v2;
 const User = require('../models/user');
 const router = new express.Router();
 const { sendMail } = require('../utils/mailer');
 const { generateVerifyCode } = require('../utils/generateVerifyCode');
 const auth = require('../middleware/auth');
+const { cloudinary } = require('../utils/getCloudinaryConfig');
 
 router.post('/users/login', async (req, res) => {
   try {
@@ -132,12 +132,6 @@ router.get('/users/:id', auth, async (req, res) => {
   } catch (error) {
     res.status(500).send(error);
   }
-});
-
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET
 });
 
 router.delete('/users/me/avatar', auth, async (req, res) => {

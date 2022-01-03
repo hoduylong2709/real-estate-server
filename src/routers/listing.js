@@ -1,15 +1,9 @@
 const express = require('express');
-const cloudinary = require('cloudinary').v2;
 const Listing = require('../models/listing');
 const { compareView } = require('../utils/compare');
 const router = new express.Router();
 const auth = require('../middleware/auth');
-
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET
-});
+const { cloudinary } = require('../utils/getCloudinaryConfig');
 
 // GET /listings?sold=true
 // GET /listings?limit=10&skip=20
