@@ -56,16 +56,13 @@ io.on('connection', socket => {
 
   // Send and get message
   socket.on('sendMessage', message => {
-    console.log(message);
     const user = getUser(message.receiverId);
-    console.log(user);
     io.to(user.socketId).emit('getMessage', message);
   });
 
   socket.on('disconnect', () => {
     console.log('A user disconnected.');
     removeUser(socket.id);
-    console.log('users', users);
     io.emit('getUsers', users);
   });
 });

@@ -12,7 +12,7 @@ router.get('/conversations/:userId', auth, async (req, res) => {
     const conversations = await Conversation.find({
       members: { $in: [req.params.userId] },
       deletes: { $nin: [req.params.userId] }
-    }).populate('members');
+    }).populate('members lastMessage');
     res.send(conversations);
   } catch (error) {
     res.status(500).send();
@@ -23,7 +23,7 @@ router.get('/conversations/:userId', auth, async (req, res) => {
 router.post('/conversations', auth, async (req, res) => {
   try {
     const existence = await Conversation.findOne({
-      members: { $in: [req.params.userId, req.body.receiverId] }
+      members: [req.user._id, req.body.receiverId]
     });
 
     if (existence) {
