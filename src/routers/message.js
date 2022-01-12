@@ -42,4 +42,21 @@ router.post('/messages', auth, async (req, res) => {
   }
 });
 
+// Set message read
+router.patch('/messages/read/:id', auth, async (req, res) => {
+  try {
+    const message = await Message.findOne({ _id: req.params.id });
+
+    if (!message) {
+      return res.status(404).send();
+    }
+
+    message.isRead = true;
+    await message.save();
+    res.send(message);
+  } catch (error) {
+    res.status(500).send();
+  }
+});
+
 module.exports = router;

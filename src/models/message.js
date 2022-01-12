@@ -31,7 +31,11 @@ const messageSchema = new mongoose.Schema({
       ref: 'User',
       default: []
     }
-  ]
+  ],
+  isRead: {
+    type: Boolean,
+    default: false
+  }
 }, { timestamps: true });
 
 // Delete image at cloudinary when message is removed
