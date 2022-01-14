@@ -3,6 +3,10 @@ const { getPublicId } = require('../utils/getPublicIdFromUrl');
 const { cloudinary } = require('../utils/getCloudinaryConfig');
 
 const messageSchema = new mongoose.Schema({
+  clientId: {
+    type: String,
+    required: true
+  },
   conversationId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,

@@ -4,7 +4,7 @@ const Conversation = require('../models/conversation');
 const router = new express.Router();
 const auth = require('../middleware/auth');
 
-// Get messages
+// Get all messages
 // /messages/:convId?limit=10&skip=10
 router.get('/messages/:convId', auth, async (req, res) => {
   try {
@@ -17,6 +17,21 @@ router.get('/messages/:convId', auth, async (req, res) => {
       sort: { createdAt: -1 }
     }).populate('senderId');
     res.send(messages);
+  } catch (error) {
+    res.status(500).send();
+  }
+});
+
+// Get message by clientId
+router.get('/messages/message/:clientId', auth, async (req, res) => {
+  try {
+    const message = await Message.findOne({ clientId: req.params.clientId });
+
+    if (!message) {
+      return res.status(404).send();
+    }
+
+    res.send(message);
   } catch (error) {
     res.status(500).send();
   }
