@@ -5,15 +5,23 @@ const router = new express.Router();
 const auth = require('../middleware/auth');
 
 // Get all messages
-// /messages/:convId?limit=10&skip=10
+// /messages/:convId?limit=10&oldest=abcxyz
 router.get('/messages/:convId', auth, async (req, res) => {
+  let oldestMessage = null;
+
+  if (req.query.oldest) {
+    oldestMessage = await Message.findOne({ _id: req.query.oldest });
+  }
+
   try {
     const messages = await Message.find({
       conversationId: req.params.convId,
-      deletes: { $nin: [req.user._id] }
+      deletes: { $nin: [req.user._id] },
+      createdAt: {
+        $lt: oldestMessage ? oldestMessage.createdAt : new Date()
+      }
     }, null, {
       limit: req.query.limit && parseInt(req.query.limit),
-      skip: req.query.skip && parseInt(req.query.skip),
       sort: { createdAt: -1 }
     }).populate('senderId');
     res.send(messages);
