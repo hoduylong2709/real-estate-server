@@ -1,5 +1,6 @@
 const express = require('express');
 const Listing = require('../models/listing');
+const User = require('../models/user');
 const { compareView } = require('../utils/compare');
 const router = new express.Router();
 const auth = require('../middleware/auth');
@@ -47,6 +48,41 @@ router.get('/listings/popular', auth, async (req, res) => {
       listing => listing.owner._id.toString() !== req.user._id.toString()
     ).sort(compareView).slice(0, 3);
     res.send(viewBasedSortedListings);
+  } catch (error) {
+    res.status(500).send();
+  }
+});
+
+router.get('/listings/:userId', auth, async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.params.userId });
+
+    if (!user) {
+      return res.status(404).send();
+    }
+
+    await user.populate({
+      path: 'listings'
+    });
+    res.send(user.listings);
+  } catch (error) {
+    res.status(500).send();
+  }
+});
+
+router.get('/listings/favorite/:userId', auth, async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.params.userId });
+
+    if (!user) {
+      return res.status(404).send();
+    }
+
+    await user.populate({
+      path: 'favoriteListings',
+      populate: 'owner'
+    });
+    res.send(user.favoriteListings);
   } catch (error) {
     res.status(500).send();
   }

@@ -125,7 +125,7 @@ router.get('/users/:id', auth, async (req, res) => {
     const user = await User.findOne({ _id: req.params.id });
 
     if (!user) {
-      return res.status(404).send()
+      return res.status(404).send();
     }
 
     res.send(user);
