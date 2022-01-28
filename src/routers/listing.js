@@ -41,6 +41,25 @@ router.get('/listings/me', auth, async (req, res) => {
   }
 });
 
+// GET /listings?limit=10&skip=20
+router.get('/listings', auth, async (req, res) => {
+  try {
+    const allListings = await Listing.find(
+      { owner: { $ne: req.user._id } },
+      null,
+      {
+        limit: req.query.limit && parseInt(req.query.limit),
+        skip: req.query.skip && parseInt(req.query.skip),
+        sort: { createdAt: -1 }
+      }
+    )
+      .populate('ratings owner');
+    res.send(allListings);
+  } catch (error) {
+    res.status(500).send();
+  }
+});
+
 router.get('/listings/popular', auth, async (req, res) => {
   try {
     const allListings = await Listing.find({}).populate('ratings owner');
