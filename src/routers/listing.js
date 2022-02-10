@@ -107,20 +107,6 @@ router.get('/listings/favorite/:userId', auth, async (req, res) => {
   }
 });
 
-router.get('/listings/:id', auth, async (req, res) => {
-  const _id = req.params.id;
-
-  try {
-    const listing = await Listing.findOne({ _id });
-    if (!listing) {
-      return res.status(404).send();
-    }
-    res.send(listing);
-  } catch (error) {
-    res.status(500).send();
-  }
-});
-
 router.post('/listings/views/:id', auth, async (req, res) => {
   try {
     const listing = await Listing.findOne({ _id: req.params.id });
