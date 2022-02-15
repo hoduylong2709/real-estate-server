@@ -43,9 +43,49 @@ router.get('/listings/me', auth, async (req, res) => {
 
 // GET /listings?limit=10&skip=20
 router.get('/listings', auth, async (req, res) => {
+  const filters = { ...req.query };
+  delete filters.limit;
+  delete filters.skip;
+
+  const filtersMap = new Map();
+
+  if (filters.hasOwnProperty('rentOrBuy')) {
+    filtersMap.set('category.rentOrBuy', filters['rentOrBuy']);
+  }
+
+  if (filters.hasOwnProperty('categoryName')) {
+    filtersMap.set('category.categoryName', filters['categoryName']);
+  }
+
+  if (filters.hasOwnProperty('bedrooms')) {
+    filtersMap.set('category.bedrooms', filters['bedrooms']);
+  }
+
+  if (filters.hasOwnProperty('newConstruction')) {
+    filtersMap.set('category.newConstruction', filters['newConstruction']);
+  }
+
+  if (filters.hasOwnProperty('yearBuilt')) {
+    filtersMap.set('category.yearBuilt', filters['yearBuilt']);
+  }
+
+  if (filters.hasOwnProperty('closeToPublicTransportation')) {
+    filtersMap.set('category.closeToPublicTransportation', filters['closeToPublicTransportation']);
+  }
+
+  if (filters.hasOwnProperty('baths')) {
+    filtersMap.set('category.baths', filters['baths']);
+  }
+
+  if (filters.hasOwnProperty('squareFeet')) {
+    filtersMap.set('category.squareFeet', filters['squareFeet']);
+  }
+
+  const filtersJSON = Object.fromEntries(filtersMap);
+
   try {
     const allListings = await Listing.find(
-      { owner: { $ne: req.user._id } },
+      { owner: { $ne: req.user._id }, ...filtersJSON },
       null,
       {
         limit: req.query.limit && parseInt(req.query.limit),
