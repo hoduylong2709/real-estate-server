@@ -84,6 +84,28 @@ router.post('/users/forgot-password', async (req, res) => {
 
 });
 
+router.post('/users/forgot-password/verify', async (req, res) => {
+  const { email, verifyCode } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).send();
+    }
+
+    const isMatch = parseInt(verifyCode) === user.verifyCode;
+
+    if (!isMatch) {
+      return res.status(400).send();
+    }
+
+    res.send();
+  } catch (error) {
+    res.status(400).send();
+  }
+});
+
 router.post('/users/verify/:id', async (req, res) => {
   try {
     const user = await User.verifyUser(req.params.id, req.body.verifyCode);
