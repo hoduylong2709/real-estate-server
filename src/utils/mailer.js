@@ -7,10 +7,13 @@ const adminPassword = process.env.ADMIN_PASSWORD;
 const mailHost = 'smtp.gmail.com';
 const mailPort = 587;
 
-const sendMail = (to, username, verifyCode) => {
+// purposeState: 0 -> for account registration
+// purposeState: 1 -> for forgetting password
+const sendMail = (to, username, verifyCode, purposeState) => {
   const mailConfirmationHtml = renderMailConfirmationHtml(
     verifyCode,
-    username
+    username,
+    purposeState
   );
 
   const transporter = nodeMailer.createTransport({

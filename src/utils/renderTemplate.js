@@ -1,4 +1,4 @@
-const renderMailConfirmationHtml = (code, username) => {
+const renderMailConfirmationHtml = (code, username, purposeState) => {
   return `
   <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
   <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -159,7 +159,7 @@ const renderMailConfirmationHtml = (code, username) => {
         <td style="overflow-wrap:break-word;word-break:break-word;padding:30px 10px 10px;font-family:'Open Sans',sans-serif;" align="left">
           
     <div style="color: #333333; line-height: 140%; text-align: center; word-wrap: break-word;">
-      <p style="font-size: 14px; line-height: 140%;"><span style="font-family: 'Open Sans', sans-serif; font-size: 24px; line-height: 33.6px;">Hi ${username}, Your Account Registration is </span><br /><span style="font-size: 28px; line-height: 39.2px; font-family: 'Open Sans', sans-serif;"><strong><span style="line-height: 39.2px; color: #2dc26b; font-size: 28px;">Confirmed</span></strong></span></p>
+      <p style="font-size: 14px; line-height: 140%;"><span style="font-family: 'Open Sans', sans-serif; font-size: 24px; line-height: 33.6px;">Hi ${username}, ${purposeState === 0 ? 'Your Account Registration is' : 'Your Email is'} </span><br /><span style="font-size: 28px; line-height: 39.2px; font-family: 'Open Sans', sans-serif;"><strong><span style="line-height: 39.2px; color: #2dc26b; font-size: 28px;">Confirmed</span></strong></span></p>
     </div>
   
         </td>

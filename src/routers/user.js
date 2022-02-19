@@ -57,11 +57,31 @@ router.post('/users', async (req, res) => {
   try {
     user.verifyCode = verifyCode;
     await user.save();
-    sendMail(user.email, user.firstName, verifyCode);
+    sendMail(user.email, user.firstName, verifyCode, 0);
     res.status(201).send({ user });
   } catch (error) {
     res.status(400).send(error);
   }
+});
+
+router.post('/users/forgot-password', async (req, res) => {
+  const verifyCode = generateVerifyCode();
+
+  try {
+    const user = await User.findOne(req.body);
+
+    if (!user) {
+      return res.status(404).send();
+    }
+
+    user.verifyCode = verifyCode;
+    await user.save();
+    sendMail(user.email, user.firstName, verifyCode, 1);
+    res.send({ verifyCode: user.verifyCode });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+
 });
 
 router.post('/users/verify/:id', async (req, res) => {
