@@ -241,4 +241,22 @@ router.patch('/users/me', auth, async (req, res) => {
   }
 });
 
+router.patch('/users/change-password', async (req, res) => {
+  const { email, newPassword } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).send();
+    }
+
+    user.password = newPassword;
+    await user.save();
+    res.send();
+  } catch (error) {
+    res.status(400).send();
+  }
+});
+
 module.exports = router;
