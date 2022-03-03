@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const router = new express.Router();
 const { sendMail } = require('../utils/mailer');
@@ -238,6 +239,24 @@ router.patch('/users/me', auth, async (req, res) => {
     res.send(req.user);
   } catch (error) {
     res.status(400).send(error);
+  }
+});
+
+router.patch('/users/me/change-password', auth, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    const isMatch = await bcrypt.compare(currentPassword, req.user.password);
+
+    if (!isMatch) {
+      return res.status(400).send();
+    }
+
+    req.user.password = newPassword;
+    await req.user.save();
+    res.send();
+  } catch (error) {
+    res.status(400).send();
   }
 });
 
