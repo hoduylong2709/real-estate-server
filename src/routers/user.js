@@ -216,7 +216,7 @@ router.get('/users/me/favorite', auth, async (req, res) => {
   try {
     await req.user.populate({
       path: 'favoriteListings',
-      populate: 'owner'
+      populate: 'owner ratings'
     });
     res.send(req.user.favoriteListings);
   } catch (error) {
