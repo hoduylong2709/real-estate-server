@@ -105,7 +105,7 @@ router.get('/listings/popular', auth, async (req, res) => {
     const allListings = await Listing.find({}).populate('ratings owner');
     const viewBasedSortedListings = allListings.filter(
       listing => listing.owner._id.toString() !== req.user._id.toString()
-    ).sort(compareView).slice(0, 3);
+    ).sort(compareView).slice(0, 4);
     res.send(viewBasedSortedListings);
   } catch (error) {
     res.status(500).send();
